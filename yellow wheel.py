@@ -1,14 +1,19 @@
 import cv2
+from math import sqrt
+import numpy as np
 
 camera = cv2.VideoCapture(0)
+
+ret, frame = camera.read()
+size = (frame.shape[1]/2, frame.shape[0]/2)
 
 while True:
     ret, frame = camera.read()
 
     if not ret:
         break
-    lower_yellow = (20, 100, 100)
-    upper_yellow = (40, 255, 255)
+    lower_yellow = np.array([20, 100, 100])
+    upper_yellow = np.array([40, 255, 255])
 
     hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv_frame, lower_yellow, upper_yellow)
@@ -33,7 +38,11 @@ while True:
         if y+h > y2:
             y2 = y+h
 
-    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    midx = round((x1+x2)/2)
+    midy = round((y1+y2)/2)
+
+    if sqrt((midx-size[0])**2 + (midy-size[1])**2) < 30:
+        cv2.imwrite('./img.png', cv2.flip(frame, 1))
 
     cv2.imshow('Object Detection', cv2.flip(frame, 1))
 
