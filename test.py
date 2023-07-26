@@ -15,12 +15,27 @@ while True:
 
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+    x1 = 10000000
+    y1 = 10000000
+    x2 = -1
+    y2 = -1
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
-        print("Detected object coordinates: x={}, y={}, width={}, height={}".format(x, y, w, h))
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        if x < x1:
+            x1 = x
 
-    cv2.imshow('Object Detection', frame)
+        if y < y1:
+            y1 = y
+
+        if x+w > x2:
+            x2 = x+w
+
+        if y+h > y2:
+            y2 = y+h
+
+    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+    cv2.imshow('Object Detection', cv2.flip(frame, 1))
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
