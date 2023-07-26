@@ -1,26 +1,48 @@
 import cv2
-import numpy as np
+import face_recognition
 
-haar_cascade = cv2.CascadeClassifier('C:\\Users\\Matei\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\cv2\\data\\haarcascade_profileface.xml')
+def detect_faces_and_landmarks_from_camera():
+    # Open the default camera (0) or specify the camera index if you have multiple cameras
+    cap = cv2.VideoCapture(0)
 
-camera = cv2.VideoCapture(0)
+    while True:
+        # Capture frame-by-frame
+        ret, frame = cap.read()
 
-while True:
-    ret, frame = camera.read()
+        if not ret:
+            print("Failed to grab frame")
+            break
 
-    if not ret:
-        break
+        # Find face locations in the frame
+        face_locations = face_recognition.face_locations(frame)
 
-    faces_rect = haar_cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), 1.1, 9)
+        # Find facial landmarks for each detected face
+        face_landmarks_list = face_recognition.face_landmarks(frame)
 
+        for face_location, face_landmarks in zip(face_locations, face_landmarks_list):
+            # Convert the face location from (top, right, bottom, left) to (top, left, width, height)
+            top, right, bottom, left = face_location
+            width = right - left
+            height = bottom - top
 
-    for (x, y, w, h) in faces_rect:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            # Draw a rectangle around the detected face
+            cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
 
-    cv2.imshow('Detected faces', frame)
+            # Draw facial landmarks on the frame
+            for landmark_type, landmark_points in face_landmarks.items():
+                for x, y in landmark_points:
+                    cv2.circle(frame, (x, y), 2, (0, 0, 255), -1)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        # Display the frame with detected faces and facial landmarks
+        cv2.imshow("Face Detection and Landmark Detection", frame)
 
-camera.release()
-cv2.destroyAllWindows()
+        # Exit the loop if 'q' is pressed
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # Release the video capture and close the OpenCV windows
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    detect_faces_and_landmarks_from_camera()
