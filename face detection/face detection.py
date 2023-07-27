@@ -1,48 +1,33 @@
 import cv2
-import face_recognition
+import imutils
 
-def detect_faces_and_landmarks_from_camera():
-    # Open the default camera (0) or specify the camera index if you have multiple cameras
-    cap = cv2.VideoCapture(0)
+def detect_people(frame, cascade):
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    rects = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),
+                                     flags=cv2.CASCADE_SCALE_IMAGE)
+    return rects
 
-    while True:
-        # Capture frame-by-frame
-        ret, frame = cap.read()
+person_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-        if not ret:
-            print("Failed to grab frame")
-            break
+video_capture = cv2.VideoCapture(0)
 
-        # Find face locations in the frame
-        face_locations = face_recognition.face_locations(frame)
+while True:
+    ret, frame = video_capture.read()
 
-        # Find facial landmarks for each detected face
-        face_landmarks_list = face_recognition.face_landmarks(frame)
+    if not ret:
+        break
 
-        for face_location, face_landmarks in zip(face_locations, face_landmarks_list):
-            # Convert the face location from (top, right, bottom, left) to (top, left, width, height)
-            top, right, bottom, left = face_location
-            width = right - left
-            height = bottom - top
+    frame = imutils.resize(frame, width=500)
 
-            # Draw a rectangle around the detected face
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+    detected_people = detect_people(frame, person_cascade)
 
-            # Draw facial landmarks on the frame
-            for landmark_type, landmark_points in face_landmarks.items():
-                for x, y in landmark_points:
-                    cv2.circle(frame, (x, y), 2, (0, 0, 255), -1)
+    for (x, y, w, h) in detected_people:
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        # Display the frame with detected faces and facial landmarks
-        cv2.imshow("Face Detection and Landmark Detection", frame)
+    cv2.imshow('Person Tracking', frame)
 
-        # Exit the loop if 'q' is pressed
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
-    # Release the video capture and close the OpenCV windows
-    cap.release()
-    cv2.destroyAllWindows()
-
-if __name__ == "__main__":
-    detect_faces_and_landmarks_from_camera()
+video_capture.release()
+cv2.destroyAllWindows()
