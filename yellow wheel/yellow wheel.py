@@ -13,8 +13,8 @@ y_servo_pin = 17
 
 servo_frequency = 50
 
-x_servo_pulse_range = (2.5, 12.5)
-y_servo_pulse_range = (2.5, 12.5)
+x_servo_pulse_range = (2.5, 10.0)
+y_servo_pulse_range = (2.5, 10.0)
 
 GPIO.setup(x_servo_pin, GPIO.OUT)
 GPIO.setup(y_servo_pin, GPIO.OUT)
@@ -40,6 +40,12 @@ def move_y(direction):
 
 lower_yellow = np.array([20, 90, 100])
 upper_yellow = np.array([40, 255, 255])
+
+move_x("left")
+
+time.sleep(3)
+
+exit()
 
 track = None
 picture = None
