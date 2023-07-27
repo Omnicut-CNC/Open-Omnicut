@@ -1,6 +1,42 @@
 import cv2
 from numpy import sqrt
 import numpy as np
+import RPi.GPIO as GPIO
+import time
+
+tracking = int(input("Tracking? "))
+
+GPIO.setmode(GPIO.BCM)
+
+x_servo_pin = 27
+y_servo_pin = 17
+
+servo_frequency = 50
+
+x_servo_pulse_range = (2.5, 12.5)
+y_servo_pulse_range = (2.5, 12.5)
+
+GPIO.setup(x_servo_pin, GPIO.OUT)
+GPIO.setup(y_servo_pin, GPIO.OUT)
+
+x_servo_pwm = GPIO.PWM(x_servo_pin, servo_frequency)
+y_servo_pwm = GPIO.PWM(y_servo_pin, servo_frequency)
+
+def move_x(direction):
+    if direction == "right":
+        x_servo_pwm.start(x_servo_pulse_range[1])
+    elif direction == "left":
+        x_servo_pwm.start(x_servo_pulse_range[0])
+    time.sleep(0.5)
+    x_servo_pwm.stop()
+
+def move_y(direction):
+    if direction == "up":
+        y_servo_pwm.start(y_servo_pulse_range[1])
+    elif direction == "down":
+        y_servo_pwm.start(y_servo_pulse_range[0])
+    time.sleep(0.5)
+    y_servo_pwm.stop()
 
 lower_yellow = np.array([20, 90, 100])
 upper_yellow = np.array([40, 255, 255])
@@ -28,14 +64,22 @@ def process_frame(frame, middle):
                 cv2.putText(frame, "X centered!", (0, 50), fontFace=20, fontScale=1, color=(0, 0, 0))
                 cv2.putText(frame, "Y centered!", (0, 100), fontFace=20, fontScale=1, color=(0, 0, 0))
                 cv2.imwrite('centered wheel.png', frame)
-            else:
+            elif tracking:
                 if Xoffset > 15:
                     cv2.putText(frame, f"X is off by {Xoffset}!", (0, 50), fontFace=20, fontScale=1, color=(0, 0, 0))
+                    if rect[0]+rect[2]/2-middle[0] < 0:
+                        move_x("right")
+                    else:
+                        move_x("left")
                 else:
                     cv2.putText(frame, f"X is centered!", (0, 50), fontFace=20, fontScale=1, color=(0, 0, 0))
 
                 if Yoffset > 15:
                     cv2.putText(frame, f"Y is off! by {Xoffset}!", (0, 100), fontFace=20, fontScale=1, color=(0, 0, 0))
+                    if rect[1]+rect[3]/2-middle[1] < 0:
+                        move_y("down")
+                    else:
+                        move_y("up")
 
                 else:
                     cv2.putText(frame, f"Y is centered!", (0, 100), fontFace=20, fontScale=1, color=(0, 0, 0))

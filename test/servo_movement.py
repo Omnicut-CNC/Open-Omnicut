@@ -9,7 +9,6 @@ y_servo_pin = 17 # Y servo pin set to 17
 
 servo_frequency = 50
 
-# Pulse range (tre testat) :)
 x_servo_pulse_range = (2.5, 12.5)
 y_servo_pulse_range = (2.5, 12.5)
 
