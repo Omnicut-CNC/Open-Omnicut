@@ -55,34 +55,34 @@ def process_frame(frame, middle):
             ellipse = cv2.fitEllipse(contour)
             cv2.ellipse(frame, ellipse, (0, 0, 255), 2)
             rect = cv2.boundingRect(contour)
-            cv2.line(frame, (int(rect[0]+rect[2]/2), int(rect[1]+rect[3]/2)), (int(frame.shape[1]/2), int(frame.shape[0]/2)), (255, 0, 0), 2)
-            cv2.line(frame, (int(rect[0]+rect[2]/2), int(frame.shape[0]/2)), (int(frame.shape[1]/2), int(frame.shape[0]/2)), (0, 255, 0), 2)
-            cv2.line(frame, (int(frame.shape[1]/2), int(rect[1]+rect[3]/2)), (int(frame.shape[1]/2), int(frame.shape[0]/2)), (0, 255, 0), 2)
+            #cv2.line(frame, (int(rect[0]+rect[2]/2), int(rect[1]+rect[3]/2)), (int(frame.shape[1]/2), int(frame.shape[0]/2)), (255, 0, 0), 2)
+            #cv2.line(frame, (int(rect[0]+rect[2]/2), int(frame.shape[0]/2)), (int(frame.shape[1]/2), int(frame.shape[0]/2)), (0, 255, 0), 2)
+            #cv2.line(frame, (int(frame.shape[1]/2), int(rect[1]+rect[3]/2)), (int(frame.shape[1]/2), int(frame.shape[0]/2)), (0, 255, 0), 2)
             Xoffset = abs(rect[0]+rect[2]/2-middle[0])
             Yoffset = abs(rect[1]+rect[3]/2-middle[1])
             if picture and sqrt(Xoffset**2 + Yoffset**2) < 30:
-                cv2.putText(frame, "X centered!", (0, 50), fontFace=20, fontScale=1, color=(0, 0, 0))
-                cv2.putText(frame, "Y centered!", (0, 100), fontFace=20, fontScale=1, color=(0, 0, 0))
+                #cv2.putText(frame, "X centered!", (0, 50), fontFace=20, fontScale=1, color=(0, 0, 0))
+                #cv2.putText(frame, "Y centered!", (0, 100), fontFace=20, fontScale=1, color=(0, 0, 0))
                 cv2.imwrite('centered wheel.png', frame)
             elif tracking:
                 if Xoffset > 15:
-                    cv2.putText(frame, f"X is off by {Xoffset}!", (0, 50), fontFace=20, fontScale=1, color=(0, 0, 0))
+                    #cv2.putText(frame, f"X is off by {Xoffset}!", (0, 50), fontFace=20, fontScale=1, color=(0, 0, 0))
                     if rect[0]+rect[2]/2-middle[0] < 0:
                         move_x("right")
                     else:
                         move_x("left")
                 else:
-                    cv2.putText(frame, f"X is centered!", (0, 50), fontFace=20, fontScale=1, color=(0, 0, 0))
+                    pass #cv2.putText(frame, f"X is centered!", (0, 50), fontFace=20, fontScale=1, color=(0, 0, 0))
 
                 if Yoffset > 15:
-                    cv2.putText(frame, f"Y is off! by {Xoffset}!", (0, 100), fontFace=20, fontScale=1, color=(0, 0, 0))
+                    #cv2.putText(frame, f"Y is off! by {Xoffset}!", (0, 100), fontFace=20, fontScale=1, color=(0, 0, 0))
                     if rect[1]+rect[3]/2-middle[1] < 0:
                         move_y("down")
                     else:
                         move_y("up")
 
                 else:
-                    cv2.putText(frame, f"Y is centered!", (0, 100), fontFace=20, fontScale=1, color=(0, 0, 0))
+                    pass #cv2.putText(frame, f"Y is centered!", (0, 100), fontFace=20, fontScale=1, color=(0, 0, 0))
 
     return frame
 
